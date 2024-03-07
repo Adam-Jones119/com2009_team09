@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="com2009_team09" type="figure_eight.py" name="pub_node" output="screen">
+  </node>
+  <node pkg="com2009_team09" type="odom_subscriber.py" name="sub_node" output="screen">
+  </node>
+</launch>
