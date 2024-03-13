@@ -1,36 +1,41 @@
 #!/usr/bin/env python3
 
 import rospy
-from sensor_msgs.msg import LaserScan
-import random
+from geometry_msgs.msg import Twist
+from std_msgs.msg import Bool
 
-def lidar_publisher():
-    rospy.init_node('lidar_publisher', anonymous=True)
-    lidar_pub = rospy.Publisher('/scan', LaserScan, queue_size=10)
-    rate = rospy.Rate(10)  # 10 Hz
-    
-    while not rospy.is_shutdown():
-        # Generate mock LiDAR data
-        ranges = [random.uniform(0.1, 5.0) for _ in range(360)]
-        intensities = [random.uniform(0.0, 1.0) for _ in range(360)]
+class MovementPublisher:
+    def __init__(self):
+        rospy.init_node('tb3_movement_publisher', anonymous=True)
+        self.publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        self.obstacle_subscriber = rospy.Subscriber('/obstacle_detected', Bool, self.obstacle_callback)
+        self.rate = rospy.Rate(10)  # 10 Hz
+        self.linear_speed = 0.2  # Adjust as needed
+        self.angular_speed = 0.5  # Adjust as needed
+        self.obstacle_detected = False
 
-        lidar_msg = LaserScan()
-        lidar_msg.header.stamp = rospy.Time.now()
-        lidar_msg.header.frame_id = "lidar_frame"
-        lidar_msg.angle_min = -3.14159274101
-        lidar_msg.angle_max = 3.14159274101
-        lidar_msg.angle_increment = 0.0174532923847
-        lidar_msg.time_increment = 0.0
-        lidar_msg.range_min = 0.0
-        lidar_msg.range_max = 100.0
-        lidar_msg.ranges = ranges
-        lidar_msg.intensities = intensities
+    def obstacle_callback(self, msg):
+        self.obstacle_detected = msg.data
 
-        lidar_pub.publish(lidar_msg)
-        rate.sleep()
+    def move_robot(self):
+        twist = Twist()
+        if not self.obstacle_detected:
+            twist.linear.x = self.linear_speed
+            twist.angular.z = 0
+        else:
+            twist.linear.x = 0  # Stop forward motion
+            twist.angular.z = self.angular_speed  # Rotate until the obstacle is no longer in front
+        self.publisher.publish(twist)
 
 if __name__ == '__main__':
     try:
-        lidar_publisher()
+        movement_pub = MovementPublisher()
+
+        while not rospy.is_shutdown():
+            # Control robot movement based on obstacle detection
+            movement_pub.move_robot()
+
+            movement_pub.rate.sleep()
+
     except rospy.ROSInterruptException:
         pass
