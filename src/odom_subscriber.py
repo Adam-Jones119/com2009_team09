@@ -23,12 +23,17 @@ class OdomSubscriber():
 
         (roll, pitch, yaw) = euler_from_quaternion([orientation.x, orientation.y, orientation.z, orientation.w], 'sxyz')
 
-        # Print current pose
-        rospy.loginfo(f"x={pos_x:.2f} [m], y={pos_y:.2f} [m], yaw={math.degrees(yaw):.1f} [degrees]")
+        # Print current pose at 1Hz
+        if self.counter % 20 == 0:
+            rospy.loginfo(f"x={pos_x:.2f} [m], y={pos_y:.2f} [m], yaw={math.degrees(yaw):.1f} [degrees]")
         
+        self.counter += 1
+
     def main(self):
         rospy.spin()
 
 if __name__ == '__main__':
     node = OdomSubscriber()
     node.main()
+
+

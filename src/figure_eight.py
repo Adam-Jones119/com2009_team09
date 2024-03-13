@@ -10,25 +10,25 @@ class CmdVelPublisher():
         self.pub = rospy.Publisher("cmd_vel", Twist, queue_size=10)
         rospy.loginfo(f"The '{self.node_name}' node is active...")
         self.counter = 0
-        self.rate = rospy.Rate(1)  # 1Hz
+        self.rate = rospy.Rate(10)  
 
     def main(self):
         while not rospy.is_shutdown():
-            # Stop the robot after 60 seconds
-            if self.counter >= 60:
+            
+            if self.counter >= 610:
                 cmd_vel_msg = Twist()
                 self.pub.publish(cmd_vel_msg)
                 break
 
             cmd_vel_msg = Twist()
-            if self.counter <= 30:
+            if self.counter <= 310:
                 # Loop 1: Move anti-clockwise
-                cmd_vel_msg.linear.x = 0.11  # Adjust velocity as needed
-                cmd_vel_msg.angular.z = 0.22  # Rotate anti-clockwise
+                cmd_vel_msg.linear.x = 0.115  
+                cmd_vel_msg.angular.z = 0.23  
             else:
                 # Loop 2: Move clockwise
-                cmd_vel_msg.linear.x = 0.11  # Adjust velocity as needed
-                cmd_vel_msg.angular.z = -0.22  # Rotate clockwise
+                cmd_vel_msg.linear.x = 0.115  
+                cmd_vel_msg.angular.z = -0.23  
 
             self.pub.publish(cmd_vel_msg)
             self.counter += 1
