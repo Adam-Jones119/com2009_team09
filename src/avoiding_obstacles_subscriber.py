@@ -18,7 +18,9 @@ class ObstacleSubscriber:
         front_arc = np.array(left_arc[::-1] + right_arc[::-1])
         
         min_distance = front_arc.min()
-        obstacle_detected = min_distance < self.threshold_distance
+
+        # Check if there is an obstacle within the threshold distance
+        obstacle_detected = min_distance > 0 and min_distance < self.threshold_distance
 
         rospy.loginfo("Minimum distance to obstacle: {}".format(min_distance))
         rospy.loginfo("Obstacle detected: {}".format(obstacle_detected))
