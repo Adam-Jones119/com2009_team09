@@ -17,10 +17,18 @@ class ObstacleSubscriber:
         right_arc = scan_data.ranges[-20:]
         front_arc = np.array(left_arc[::-1] + right_arc[::-1])
         
-        min_distance = front_arc.min()
+        # Filter out zero values
+        front_arc = front_arc[front_arc > 0]
+
+        if len(front_arc) == 0:
+            # No valid distances found
+            min_distance = float('inf')  # Set min_distance to infinity
+        else:
+            # Calculate the minimum distance
+            min_distance = front_arc.min()
 
         # Check if there is an obstacle within the threshold distance
-        obstacle_detected = min_distance > 0 and min_distance < self.threshold_distance
+        obstacle_detected = min_distance < self.threshold_distance
 
         rospy.loginfo("Minimum distance to obstacle: {}".format(min_distance))
         rospy.loginfo("Obstacle detected: {}".format(obstacle_detected))
