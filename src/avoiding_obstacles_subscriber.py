@@ -2,7 +2,7 @@
 
 import rospy
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import Bool  # Import Bool message type
+from std_msgs.msg import Bool
 import numpy as np
 
 class ObstacleSubscriber:
@@ -19,6 +19,9 @@ class ObstacleSubscriber:
         
         min_distance = front_arc.min()
         obstacle_detected = min_distance < self.threshold_distance
+
+        rospy.loginfo("Minimum distance to obstacle: {}".format(min_distance))
+        rospy.loginfo("Obstacle detected: {}".format(obstacle_detected))
 
         self.publisher.publish(Bool(obstacle_detected))  # Publish obstacle detection result as Bool message
 

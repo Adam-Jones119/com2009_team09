@@ -22,9 +22,11 @@ class MovementPublisher:
         if not self.obstacle_detected:
             twist.linear.x = self.linear_speed
             twist.angular.z = 0
+            rospy.loginfo("Moving forward")
         else:
             twist.linear.x = 0  # Stop forward motion
             twist.angular.z = self.angular_speed  # Rotate until the obstacle is no longer in front
+            rospy.loginfo("Rotating to avoid obstacle")
         self.publisher.publish(twist)
 
 if __name__ == '__main__':
