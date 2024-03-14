@@ -6,7 +6,7 @@ from std_msgs.msg import Bool
 import numpy as np
 
 # Import the ObstacleSubscriber class
-from tb3_obstacle_subscriber import ObstacleSubscriber
+from avoiding_obstacles_subscriber import ObstacleSubscriber
 
 class MovementPublisher:
     def __init__(self):
