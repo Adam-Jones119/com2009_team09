@@ -11,7 +11,6 @@ class ObstacleSubscriber:
         self.publisher = rospy.Publisher('/obstacle_detected', Bool, queue_size=10)
         self.subscriber = rospy.Subscriber('/scan', LaserScan, self.laserscan_callback)
         self.threshold_distance = 0.5  # Adjust as needed
-        self.front_arc = None
 
     def laserscan_callback(self, scan_data):
         left_arc = scan_data.ranges[0:21]
@@ -35,12 +34,6 @@ class ObstacleSubscriber:
         rospy.loginfo("Obstacle detected: {}".format(obstacle_detected))
 
         self.publisher.publish(Bool(obstacle_detected))  # Publish obstacle detection result as Bool message
-
-        # Store the front arc distances for later use in the publisher node
-        self.front_arc = front_arc
-
-    def get_front_arc(self):
-        return self.front_arc
 
 if __name__ == '__main__':
     try:
