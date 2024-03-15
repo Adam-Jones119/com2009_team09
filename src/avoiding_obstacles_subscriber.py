@@ -2,13 +2,13 @@
 
 import rospy
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import Bool
+from std_msgs.msg import String
 import numpy as np
 
 class ObstacleSubscriber:
     def __init__(self):
         rospy.init_node('tb3_obstacle_subscriber', anonymous=True)
-        self.publisher = rospy.Publisher('/obstacle_detected', Bool, queue_size=10)
+        self.publisher = rospy.Publisher('/obstacle_detected', String, queue_size=10)
         self.subscriber = rospy.Subscriber('/scan', LaserScan, self.laserscan_callback)
         self.threshold_distance = 0.5  # Adjust as needed
         self.front_arc = None
@@ -29,12 +29,26 @@ class ObstacleSubscriber:
             min_distance = front_arc.min()
 
         # Check if there is an obstacle within the threshold distance
-        obstacle_detected = min_distance < self.threshold_distance
+        obstacle_detected = "None"
+        on_left = np.array(left_arc).min() < self.threshold_distance
+        on_right = np.array(right_arc).min() < self.threshold_distance
+
+        if on_left:
+            obstacle_detected = "Left"
+            if on_right:
+                obstacle_detected = "Both"
+        elif on_right:
+            obstacle_detected = "Right"
+        else:
+            obstacle_detected = "None"
+
 
         rospy.loginfo("Minimum distance to obstacle: {}".format(min_distance))
         rospy.loginfo("Obstacle detected: {}".format(obstacle_detected))
+        rospy.loginfo("Obstacle on left: {}".format(on_left))
+        rospy.loginfo("Obstacle on right: {}".format(on_right))
 
-        self.publisher.publish(Bool(obstacle_detected))  # Publish obstacle detection result as Bool message
+        self.publisher.publish(obstacle_detected)  # Publish obstacle detection result as Bool message
         self.front_arc = front_arc
         
 if __name__ == '__main__':

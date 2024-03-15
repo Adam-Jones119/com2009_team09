@@ -2,13 +2,13 @@
 
 import rospy
 from geometry_msgs.msg import Twist
-from std_msgs.msg import Bool
+from std_msgs.msg import String
 
 class MovementPublisher:
     def __init__(self):
         rospy.init_node('tb3_movement_publisher', anonymous=True)
         self.publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-        self.obstacle_subscriber = rospy.Subscriber('/obstacle_detected', Bool, self.obstacle_callback)
+        self.obstacle_subscriber = rospy.Subscriber('/obstacle_detected', String, self.obstacle_callback)
         self.rate = rospy.Rate(10)  # 10 Hz
         self.linear_speed = 0.2  # Adjust as needed
         self.angular_speed = 0.5  # Adjust as needed
@@ -19,11 +19,15 @@ class MovementPublisher:
 
     def move_robot(self):
         twist = Twist()
-        if not self.obstacle_detected:
+        if self.obstacle_detected == "None":
             twist.linear.x = self.linear_speed
             twist.angular.z = 0
             rospy.loginfo("Moving forward")
         else:
+            if self.obstacle_detected == "Left":
+                self.angular_speed = -0.5
+            elif self.obstacle_detected == "Right":
+                self.angular_speed == 0.5
             twist.linear.x = 0  # Stop forward motion
             twist.angular.z = self.angular_speed  # Rotate until the obstacle is no longer in front
             rospy.loginfo("Rotating to avoid obstacle")
