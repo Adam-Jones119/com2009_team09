@@ -68,6 +68,7 @@ class Motion():
 
             Motion().set_velocity(linear= , angular= )
         """
+        rospy.loginfo(f"Publishing velocity: linear={self.vel_cmd.linear.x:.2f}, angular={self.vel_cmd.angular.z:.2f}")
         last_published = rospy.get_time() - self.timestamp 
         self.timestamp = rospy.get_time()
         self.publisher.publish(self.vel_cmd)
